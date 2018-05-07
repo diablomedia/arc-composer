@@ -107,24 +107,33 @@ class ComposerLinter extends ArcanistExternalLinter
         return 'composer';
     }
 
+    protected function getPathArgumentForLinterFuture($path)
+    {
+        $path = $this->getJsonFilePath($path);
+        return parent::getPathArgumentForLinterFuture($path);
+    }
+
     /**
      * If working on a lock file, get the correlating JSON file
+     *
+     * @param string $path
+     * @return string
      */
     protected function getJsonFilePath($path)
     {
         return preg_replace('/.lock$/', '.json', $path);
     }
 
+    /**
+     * Read in the contents of the JSON config file
+     *
+     * @param string $path
+     * @return string
+     */
     protected function loadJsonConfig($path)
     {
         $path = $this->getJsonFilePath($path);
         return file_get_contents($path);
-    }
-
-    protected function getPathArgumentForLinterFuture($path)
-    {
-        $path = $this->getJsonFilePath($path);
-        return parent::getPathArgumentForLinterFuture($path);
     }
 
     protected function parseLinterOutput($path, $err, $stdout, $stderr)
@@ -147,20 +156,18 @@ class ComposerLinter extends ArcanistExternalLinter
             return false;
         }
 
-        // Composer error codes
-        // 1 validation warning(s), only when --strict is given
-        // 2 validation error(s)
-        // 3 file unreadable or missing
-
         $lines = phutil_split_lines($stderr, $retain_endings = false);
 
         $messages = [];
         foreach ($lines as $line) {
+            // Skip lines that contain ignored strings
             foreach ($this->ignoreStrings as $string) {
                 if (strpos($line, $string) !== false) {
                     continue 2;
                 }
             }
+
+            // Use ANSI color codes to determine message severity
             switch (substr($line, 0, 8)) {
                 case "\e[30;43m": // yellow background
                     $name = 'Composer warning';
