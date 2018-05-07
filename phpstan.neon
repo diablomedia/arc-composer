@@ -1,5 +1,5 @@
 parameters:
-    bootstrap: %rootDir%/../../../arcanist/scripts/__init_script__.php
+    bootstrap: %rootDir%/../../../submodules/arcanist/scripts/__init_script__.php
     ignoreErrors:
         # phutil_split_lines specifies "list" return type rather than "array"
         - '#Argument of an invalid type list supplied for foreach, only iterables are supported.#'
