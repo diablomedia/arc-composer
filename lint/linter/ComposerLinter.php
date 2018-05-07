@@ -39,31 +39,49 @@ class ComposerLinter extends ArcanistExternalLinter
      */
     protected $strict = false;
 
+    /**
+     * @return string Human-readable linter name.
+     */
     public function getInfoName()
     {
         return pht('Composer Dependency Manager');
     }
 
+    /**
+     * @return string|null Optionally, return a brief human-readable description.
+     */
     public function getInfoDescription()
     {
         return pht('A linter for composer.json & composer.lock files.');
     }
 
+    /**
+     * @return string|null Optionally, return a brief human-readable description.
+     */
     public function getInstallInstructions()
     {
         return pht('Install composer: https://getcomposer.org/download/');
     }
 
+    /**
+     * @return string The linter name
+     */
     public function getLinterName()
     {
         return 'COMPOSER';
     }
 
+    /**
+     * @return string The linter name to be used in .arclint
+     */
     public function getLinterConfigurationName()
     {
         return 'diablomedia-composer';
     }
 
+    /**
+     * @return array Linter-specific configuration options that can be set
+     */
     public function getLinterConfigurationOptions()
     {
         $options = [
@@ -76,23 +94,30 @@ class ComposerLinter extends ArcanistExternalLinter
         return $options + parent::getLinterConfigurationOptions();
     }
 
+    /**
+     * @param string $key The key of the configuration option
+     * @param string $value The value of the configuration option
+     */
     public function setLinterConfigurationValue($key, $value)
     {
         switch ($key) {
             case 'strict':
                 $this->strict = $value === "true" ? true : false;
-                return;
-
-            default:
-                return parent::setLinterConfigurationValue($key, $value);
+                break;
         }
     }
 
+    /**
+     * @return bool Return true to continue on nonzero error code.
+     */
     public function shouldExpectCommandErrors()
     {
         return true;
     }
 
+    /**
+     * @return array<string> Mandatory flags
+     */
     public function getMandatoryFlags()
     {
         return ['validate', '--ansi'];
@@ -102,11 +127,18 @@ class ComposerLinter extends ArcanistExternalLinter
         }
     }
 
+    /**
+     * @return string Default binary to execute.
+     */
     public function getDefaultBinary()
     {
         return 'composer';
     }
 
+    /**
+     * @param string $path Path to the file being linted
+     * @return string The command-ready file argument
+     */
     protected function getPathArgumentForLinterFuture($path)
     {
         $path = $this->getJsonFilePath($path);
@@ -136,6 +168,12 @@ class ComposerLinter extends ArcanistExternalLinter
         return file_get_contents($path);
     }
 
+    /**
+     * @param string $path Path to the file being linted.
+     * @param int $err Exit code of the linter.
+     * @param string $stdout Stdout of the linter.
+     * @param string $stderr Stderr of the linter.
+     */
     protected function parseLinterOutput($path, $err, $stdout, $stderr)
     {
         $jsonPath = $this->getJsonFilePath($path);
