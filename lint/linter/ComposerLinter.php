@@ -256,7 +256,6 @@ class ComposerLinter extends ArcanistExternalLinter
                     // Perform the regex match, storing results in $matches
                     $matches = [];
                     preg_match('|' . $keyRegex . '|s', $contents, $matches, PREG_OFFSET_CAPTURE);
-                    var_dump($keyRegex);
 
                     if (!empty($matches)) {
                         // Parse the last result in $matches to determine the line number
