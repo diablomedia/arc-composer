@@ -184,15 +184,19 @@ class ComposerLinter extends ArcanistExternalLinter
             return [$message];
         }
 
+        if ($err === 0) { // successful validation
+            return [];
+        }
+
+        if (!$stderr) { // error code, but no output to parse
+            return false;
+        }
+
         $this->parsedFiles[] = $jsonPath;
 
         $jsonContents    = '';
         $requireContents = '';
         $requireLineNum  = 0;
-
-        if (!$stderr) {
-            return false;
-        }
 
         $lines = phutil_split_lines($stderr, $retain_endings = false);
 
